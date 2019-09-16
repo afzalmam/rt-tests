@@ -42,7 +42,7 @@ static unsigned int fifo = 0;
 #define THREAD_MODE 0
 #define PROCESS_MODE 1
 
-static unsigned int process_mode = PROCESS_MODE;
+static unsigned int process_mode = THREAD_MODE;
 
 static int use_pipes = 0;
 
@@ -196,6 +196,7 @@ static int create_worker(childinfo_t *child, void *ctx, void *(*func)(void *))
 	switch (process_mode) {
 	case PROCESS_MODE: /* process mode */
 		/* Fork the sender/receiver child. */
+#if 0
 		switch ((child->pid = fork())) {
 			case -1:
 				sneeze("fork()");
@@ -204,6 +205,7 @@ static int create_worker(childinfo_t *child, void *ctx, void *(*func)(void *))
 				(*func) (ctx);
 				exit(0);
 		}
+#endif
 		break;
 
 	case THREAD_MODE: /* threaded mode */
@@ -403,7 +405,8 @@ static void process_options (int argc, char *argv[])
 			process_mode = THREAD_MODE;
 			break;
 		case 'P':
-			process_mode = PROCESS_MODE;
+			fprintf(stderr, "--processes|-P not supported\n");
+			error = 1;
 			break;
 
 		case 'F':
